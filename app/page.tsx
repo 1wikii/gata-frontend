@@ -3,14 +3,7 @@
 import { NextPage } from "next";
 
 import React, { useState } from "react";
-import {
-  CheckCircle,
-  FileText,
-  Star,
-  BarChart3,
-  Calendar,
-  ChevronDown,
-} from "lucide-react";
+import { CheckCircle, FileText, Star, BarChart3, Calendar, ChevronDown } from "lucide-react";
 import CardSchedule from "@/components/ui/card-schedule";
 
 const Home: NextPage = () => {
@@ -51,13 +44,11 @@ const Home: NextPage = () => {
   const faqData = [
     {
       question: "Apa itu GATA?",
-      answer:
-        "GATA adalah portal terpadu untuk mendukung administrasi tugas akhir.",
+      answer: "GATA adalah portal terpadu untuk mendukung administrasi tugas akhir.",
     },
     {
       question: "Siapa yang bisa menggunakan GATA?",
-      answer:
-        "Mahasiswa, dosen pembimbing, penguji, dan admin dapat menggunakan sistem ini.",
+      answer: "Mahasiswa, dosen pembimbing, penguji, dan admin dapat menggunakan sistem ini.",
     },
     {
       question: "Apa keuntungan menggunakan GATA?",
@@ -80,18 +71,18 @@ const Home: NextPage = () => {
           TUGAS AKHIR
         </h1>
         <p className="text-lg md:text-xl mb-8 text-blue-50">
-          Mempermudah mahasiswa, dosen, dan admin dalam proses monitoring,
-          penilaian, serta berita acara tugas akhir.
+          Mempermudah mahasiswa, dosen, dan admin dalam proses monitoring, penilaian, serta berita
+          acara tugas akhir.
         </p>
         <div className="flex justify-center gap-4">
           <a
-            href={`${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`}
+            href={`/auth/login`}
             className="bg-blue-800 hover:bg-blue-900 text-white px-8 py-3 rounded-md font-semibold transition-colors"
           >
             Login
           </a>
           <a
-            href={`${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`}
+            href={`/auth/register`}
             className="bg-transparent border-2 border-white hover:bg-white hover:text-blue-600 text-white px-8 py-3 rounded-md font-semibold transition-colors"
           >
             Daftar
@@ -108,10 +99,9 @@ const Home: NextPage = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-gray-700 leading-relaxed mb-6">
-                GATA adalah portal terpadu untuk mendukung administrasi tugas
-                akhir. Sistem ini dirancang agar mahasiswa, dosen, dan admin
-                dapat mengelola proses validasi, monitoring bimbingan,
-                penilaian, berita acara, serta jadwal sidang secara lebih
+                GATA adalah portal terpadu untuk mendukung administrasi tugas akhir. Sistem ini
+                dirancang agar mahasiswa, dosen, dan admin dapat mengelola proses validasi,
+                monitoring bimbingan, penilaian, berita acara, serta jadwal sidang secara lebih
                 efisien dan transparan.
               </p>
               <div className="flex gap-4">
@@ -153,9 +143,7 @@ const Home: NextPage = () => {
                 className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow"
               >
                 <div className="text-blue-600 mb-4">{fitur.icon}</div>
-                <h3 className="text-xl font-bold mb-3 text-gray-800">
-                  {fitur.title}
-                </h3>
+                <h3 className="text-xl font-bold mb-3 text-gray-800">{fitur.title}</h3>
                 <p className="text-gray-600">{fitur.description}</p>
               </div>
             ))}
@@ -176,22 +164,15 @@ const Home: NextPage = () => {
       {/* FAQ Section */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
-            FAQ
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">FAQ</h2>
           <div className="space-y-4">
             {faqData.map((faq, index) => (
-              <div
-                key={index}
-                className="border border-gray-200 rounded-lg overflow-hidden"
-              >
+              <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
                 <button
                   onClick={() => toggleFaq(index)}
                   className="w-full px-6 py-4 flex justify-between items-center bg-white hover:bg-gray-50 transition-colors"
                 >
-                  <span className="font-semibold text-gray-800 text-left">
-                    {faq.question}
-                  </span>
+                  <span className="font-semibold text-gray-800 text-left">{faq.question}</span>
                   <ChevronDown
                     className={`w-5 h-5 text-gray-600 transition-transform ${
                       openFaq === index ? "rotate-180" : ""
@@ -213,9 +194,8 @@ const Home: NextPage = () => {
       <footer className="bg-blue-600 text-white py-6 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-sm md:text-base">
-            © 2025 Teknik Informatika ITERA. All rights reserved || Andika
-            Setiawan, Martin C.T Manullang, Ahmad Dwiky Zerro Dixxon, Rafli
-            Hafidz Fadilah
+            © 2025 Teknik Informatika ITERA. All rights reserved || Andika Setiawan, Martin C.T
+            Manullang, Ahmad Dwiky Zerro Dixxon, Rafli Hafidz Fadilah
           </p>
         </div>
       </footer>
