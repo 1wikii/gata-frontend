@@ -194,8 +194,7 @@ const Home: NextPage = () => {
       <footer className="bg-blue-600 text-white py-6 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-sm md:text-base">
-            © 2025 Teknik Informatika ITERA. All rights reserved || Andika Setiawan, Martin C.T
-            Manullang, Ahmad Dwiky Zerro Dixxon, Rafli Hafidz Fadilah
+            © 2025 Teknik Informatika ITERA. All rights reserved
           </p>
         </div>
       </footer>
