@@ -11,12 +11,14 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { api } from "@/utils/api";
+import { set } from "react-hook-form";
 
 export interface SidangScheduleRow {
+  id: number;
   nim: string;
   name: string;
   judul: string;
-  capstone_code: string;
+  capstone_code?: string;
   type: string;
   date: string;
   startTime: string;
@@ -30,38 +32,88 @@ export interface SidangScheduleRow {
 }
 
 const TugasAkhirSchedule = () => {
-  const [displaySchedules, setDisplaySchedules] = useState<SidangScheduleRow[]>(
-    []
-  );
+  const [displaySchedules, setDisplaySchedules] = useState<SidangScheduleRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const DUMMY: SidangScheduleRow[] = Array.from({ length: 100 }, (_, i) => {
+    const id = i + 1;
+    const nim = String(202500000 + id).padStart(9, "0");
+    const supervisors = [
+      "Andika Setiawan, S.Kom., M.Cs.",
+      "Hafiz Budi Firmansyah, Ph.D.",
+      "Dr. Bambang Sugito, M.Kom.",
+      "Prof. Siti Nurhalimah, Ph.D.",
+      "Imam Eko Wicaksono, S.Si., M.Si.",
+    ];
+    const examiners = [
+      "Hartanto Tantriawan, S.Kom., M.Kom",
+      "Imam Eko Wicaksono, S.Si., M.Si.",
+      "Dr. Budi Santoso, M.Tech.",
+      "Ir. Suwardi, Ph.D.",
+      "Dr. Ani Wijayanti, M.Si.",
+    ];
+    const types = ["proposal", "sidang"];
+    const locations = ["Prodi", "Lab A", "Lab B", "Ruang Meeting 1", "Ruang Meeting 2"];
+    const baseDate = new Date(2026, 3, 13); // May 13, 2026
+    const scheduleDate = new Date(baseDate);
+    scheduleDate.setDate(scheduleDate.getDate() + Math.floor(i / 2));
+    const dateString = scheduleDate.toISOString().split("T")[0];
+    const timeSlots = [
+      { start: "08:00", end: "09:00" },
+      { start: "09:00", end: "10:00" },
+      { start: "10:00", end: "11:00" },
+      { start: "11:00", end: "12:00" },
+      { start: "13:00", end: "14:00" },
+      { start: "14:00", end: "15:00" },
+      { start: "15:00", end: "16:00" },
+    ];
+    const timeSlot = timeSlots[i % timeSlots.length];
+
+    return {
+      id,
+      nim,
+      name: `Student ${String(id).padStart(2, "0")}`,
+      judul: `Penelitian Tugas Akhir - Topik ${String(id).padStart(2, "0")}`,
+      type: types[i % 2],
+      date: dateString,
+      startTime: timeSlot.start,
+      endTime: timeSlot.end,
+      spv_1: supervisors[i % supervisors.length],
+      spv_2: supervisors[(i + 1) % supervisors.length],
+      examiner_1: examiners[i % examiners.length],
+      examiner_2: examiners[(i + 1) % examiners.length],
+      status: "scheduled",
+      location: locations[i % locations.length],
+    };
+  });
+
   // Fetch data dari API jika useApi = true
   useEffect(() => {
-    const loadSchedules = async () => {
-      setIsLoading(true);
-      try {
-        setError(null);
-        const response = await api.get("/jadwal-sidang");
-        const result = await response.json();
+    // const loadSchedules = async () => {
+    //   setIsLoading(true);
+    //   try {
+    //     setError(null);
+    //     const response = await api.get("/jadwal-sidang");
+    //     const result = await response.json();
 
-        if (response.ok) {
-          setDisplaySchedules(result.data);
-        }
-      } catch (err) {
-        console.error("Error loading schedules:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Terjadi kesalahan saat memuat jadwal sidang"
-        );
-        setDisplaySchedules([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    //     if (response.ok) {
+    //       setDisplaySchedules(result.data);
+    //     }
+    //   } catch (err) {
+    //     console.error("Error loading schedules:", err);
+    //     setError(
+    //       err instanceof Error ? err.message : "Terjadi kesalahan saat memuat jadwal sidang",
+    //     );
+    //     setDisplaySchedules([]);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
 
-    loadSchedules();
+    // loadSchedules();
+
+    setDisplaySchedules(DUMMY as SidangScheduleRow[]);
   }, []);
 
   // Find the current Monday or next Monday to start the week
@@ -83,8 +135,7 @@ const TugasAkhirSchedule = () => {
   };
 
   const [currentWeekStart, setCurrentWeekStart] = useState(getStartOfWeek());
-  const [selectedSchedule, setSelectedSchedule] =
-    useState<SidangScheduleRow | null>(null);
+  const [selectedSchedule, setSelectedSchedule] = useState<SidangScheduleRow | null>(null);
 
   // Generate weekdays only (Monday-Friday) for the next 35 working days
   const generateDates = (startDate: Date) => {
@@ -128,7 +179,7 @@ const TugasAkhirSchedule = () => {
     const currentWeekStartString = formatDateString(currentWeekStart);
 
     const startIndex = allDates.findIndex(
-      (date) => formatDateString(date) === currentWeekStartString
+      (date) => formatDateString(date) === currentWeekStartString,
     );
 
     if (startIndex === -1) {
@@ -142,9 +193,7 @@ const TugasAkhirSchedule = () => {
     const dates = allDates.slice(startIndex, endIndex);
 
     // Return available dates, even if less than 5 days
-    return dates.length > 0
-      ? dates
-      : allDates.slice(0, Math.min(5, allDates.length));
+    return dates.length > 0 ? dates : allDates.slice(0, Math.min(5, allDates.length));
   }, [currentWeekStart, allDates]);
 
   const formatDate = (date: Date) => {
@@ -223,9 +272,7 @@ const TugasAkhirSchedule = () => {
     if (normalizedNewDate.getTime() <= maxDate.getTime()) {
       // Check if we have at least one weekday available from the new start
       const newDateString = formatDateString(newDate);
-      const newStartIndex = allDates.findIndex(
-        (date) => formatDateString(date) === newDateString
-      );
+      const newStartIndex = allDates.findIndex((date) => formatDateString(date) === newDateString);
 
       // Allow navigation if we have at least one weekday available
       if (newStartIndex !== -1 && newStartIndex < allDates.length) {
@@ -354,9 +401,7 @@ const TugasAkhirSchedule = () => {
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex items-start gap-3 mb-6">
             <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-semibold text-red-900 mb-1">
-                Gagal Memuat Jadwal
-              </h4>
+              <h4 className="font-semibold text-red-900 mb-1">Gagal Memuat Jadwal</h4>
               <p className="text-sm text-red-700">{error}</p>
             </div>
           </div>
@@ -365,9 +410,7 @@ const TugasAkhirSchedule = () => {
         {/* Empty State */}
         {!isLoading && !error && displaySchedules.length === 0 && (
           <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Belum Ada Jadwal
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Jadwal</h3>
             <p className="text-gray-600">
               Jadwal sidang akan ditampilkan di sini setelah dijadwalkan.
             </p>
@@ -416,31 +459,18 @@ const TugasAkhirSchedule = () => {
                     return aHour * 60 + aMin - (bHour * 60 + bMin);
                   });
 
-                const dayNames = [
-                  "Minggu",
-                  "Senin",
-                  "Selasa",
-                  "Rabu",
-                  "Kamis",
-                  "Jumat",
-                  "Sabtu",
-                ];
+                const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
                 const dayName = dayNames[date.getDay()];
 
                 return (
-                  <div
-                    key={dateIdx}
-                    className="bg-white rounded-lg shadow-md overflow-hidden"
-                  >
+                  <div key={dateIdx} className="bg-white rounded-lg shadow-md overflow-hidden">
                     {/* Day Header */}
                     <div className="bg-blue-600 text-white p-4">
                       <h3 className="text-lg font-semibold">{dayName}</h3>
                       <p className="text-sm opacity-90">
                         {formatted.date} {formatted.month}
                       </p>
-                      <p className="text-xs mt-1">
-                        {daySchedules.length} Jadwal
-                      </p>
+                      <p className="text-xs mt-1">{daySchedules.length} Jadwal</p>
                     </div>
 
                     {/* Schedule List */}
@@ -467,16 +497,12 @@ const TugasAkhirSchedule = () => {
                               </div>
                               <span
                                 className={`text-xs px-2 py-1 rounded font-medium ${
-                                  schedule.type
-                                    .toLowerCase()
-                                    .includes("proposal")
+                                  schedule.type.toLowerCase().includes("proposal")
                                     ? "bg-blue-100 text-blue-800"
                                     : "bg-purple-100 text-purple-800"
                                 }`}
                               >
-                                {schedule.type === "proposal"
-                                  ? "Proposal"
-                                  : "Sidang"}
+                                {schedule.type === "proposal" ? "Proposal" : "Sidang"}
                               </span>
                             </div>
 
@@ -493,17 +519,13 @@ const TugasAkhirSchedule = () => {
                             {schedule.location && (
                               <div className="flex items-center gap-1 text-xs text-gray-700 mb-2">
                                 <MapPin size={12} className="text-blue-600" />
-                                <span className="font-medium">
-                                  {schedule.location}
-                                </span>
+                                <span className="font-medium">{schedule.location}</span>
                               </div>
                             )}
 
                             {/* Supervisors */}
                             <div className="mb-2">
-                              <p className="text-xs text-gray-600 mb-1">
-                                Pembimbing:
-                              </p>
+                              <p className="text-xs text-gray-600 mb-1">Pembimbing:</p>
                               <div className="flex gap-1 flex-wrap">
                                 {schedule.spv_1 && (
                                   <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
@@ -520,9 +542,7 @@ const TugasAkhirSchedule = () => {
 
                             {/* Examiners */}
                             <div>
-                              <p className="text-xs text-gray-600 mb-1">
-                                Penguji:
-                              </p>
+                              <p className="text-xs text-gray-600 mb-1">Penguji:</p>
                               <div className="flex gap-1 flex-wrap">
                                 {schedule.examiner_1 && (
                                   <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded">
@@ -559,9 +579,7 @@ const TugasAkhirSchedule = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-t-lg flex items-center justify-between sticky top-0 z-10">
-              <h2 className="text-xl font-semibold">
-                Detail Sidang Tugas Akhir
-              </h2>
+              <h2 className="text-xl font-semibold">Detail Sidang Tugas Akhir</h2>
               <button
                 onClick={() => setSelectedSchedule(null)}
                 className="hover:bg-blue-700 rounded p-1 transition cursor-pointer"
@@ -573,9 +591,7 @@ const TugasAkhirSchedule = () => {
             <div className="p-6">
               <div className="flex items-start justify-between mb-6">
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                    {selectedSchedule.name}
-                  </h3>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">{selectedSchedule.name}</h3>
                   <p className="text-gray-600 flex items-center gap-2">
                     <User size={16} />
                     <span className="font-mono">{selectedSchedule.nim}</span>
@@ -595,12 +611,7 @@ const TugasAkhirSchedule = () => {
               {/* Judul */}
               <div className="mb-6 bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -610,9 +621,7 @@ const TugasAkhirSchedule = () => {
                   </svg>
                   Judul Tugas Akhir
                 </h4>
-                <p className="text-gray-700 leading-relaxed">
-                  {selectedSchedule.judul || "-"}
-                </p>
+                <p className="text-gray-700 leading-relaxed">{selectedSchedule.judul || "-"}</p>
               </div>
 
               {/* Jadwal dan Lokasi */}
@@ -627,12 +636,8 @@ const TugasAkhirSchedule = () => {
                   </p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                  <h4 className="text-sm font-semibold text-green-700 mb-2">
-                    TANGGAL
-                  </h4>
-                  <p className="text-gray-800 font-medium">
-                    {selectedSchedule.date}
-                  </p>
+                  <h4 className="text-sm font-semibold text-green-700 mb-2">TANGGAL</h4>
+                  <p className="text-gray-800 font-medium">{selectedSchedule.date}</p>
                 </div>
                 {selectedSchedule.location && (
                   <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
@@ -640,9 +645,7 @@ const TugasAkhirSchedule = () => {
                       <MapPin size={16} />
                       LOKASI
                     </h4>
-                    <p className="text-gray-800 font-medium">
-                      {selectedSchedule.location}
-                    </p>
+                    <p className="text-gray-800 font-medium">{selectedSchedule.location}</p>
                   </div>
                 )}
               </div>
@@ -650,12 +653,7 @@ const TugasAkhirSchedule = () => {
               {/* Pembimbing */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -668,22 +666,14 @@ const TugasAkhirSchedule = () => {
                 <div className="flex flex-col gap-2">
                   {selectedSchedule.spv_1 && (
                     <div className="flex items-center gap-2 bg-blue-50 px-4 py-3 rounded-lg border border-blue-200">
-                      <span className="font-semibold text-blue-800 text-sm">
-                        Pembimbing 1:
-                      </span>
-                      <span className="text-gray-800">
-                        {selectedSchedule.spv_1}
-                      </span>
+                      <span className="font-semibold text-blue-800 text-sm">Pembimbing 1:</span>
+                      <span className="text-gray-800">{selectedSchedule.spv_1}</span>
                     </div>
                   )}
                   {selectedSchedule.spv_2 && (
                     <div className="flex items-center gap-2 bg-blue-50 px-4 py-3 rounded-lg border border-blue-200">
-                      <span className="font-semibold text-blue-800 text-sm">
-                        Pembimbing 2:
-                      </span>
-                      <span className="text-gray-800">
-                        {selectedSchedule.spv_2}
-                      </span>
+                      <span className="font-semibold text-blue-800 text-sm">Pembimbing 2:</span>
+                      <span className="text-gray-800">{selectedSchedule.spv_2}</span>
                     </div>
                   )}
                 </div>
@@ -692,12 +682,7 @@ const TugasAkhirSchedule = () => {
               {/* Penguji */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -710,22 +695,14 @@ const TugasAkhirSchedule = () => {
                 <div className="flex flex-col gap-2">
                   {selectedSchedule.examiner_1 && (
                     <div className="flex items-center gap-2 bg-amber-50 px-4 py-3 rounded-lg border border-amber-200">
-                      <span className="font-semibold text-amber-800 text-sm">
-                        Penguji 1:
-                      </span>
-                      <span className="text-gray-800">
-                        {selectedSchedule.examiner_1}
-                      </span>
+                      <span className="font-semibold text-amber-800 text-sm">Penguji 1:</span>
+                      <span className="text-gray-800">{selectedSchedule.examiner_1}</span>
                     </div>
                   )}
                   {selectedSchedule.examiner_2 && (
                     <div className="flex items-center gap-2 bg-amber-50 px-4 py-3 rounded-lg border border-amber-200">
-                      <span className="font-semibold text-amber-800 text-sm">
-                        Penguji 2:
-                      </span>
-                      <span className="text-gray-800">
-                        {selectedSchedule.examiner_2}
-                      </span>
+                      <span className="font-semibold text-amber-800 text-sm">Penguji 2:</span>
+                      <span className="text-gray-800">{selectedSchedule.examiner_2}</span>
                     </div>
                   )}
                 </div>
